@@ -345,6 +345,7 @@
                     url: "api/getMattersByUser/"+ id +"",
                 })
                 .done(function( data ) {
+                    console.log(data);
                     printModalMatters(data);
                 });
             });
@@ -408,6 +409,7 @@
                     url: "api/getUser/"+ id +""
                 })
                 .done(function( data ) {
+                    console.log(data)
                     openModalUpdateUser(data);
                 });
             });
@@ -415,7 +417,7 @@
 
         async function openModalUpdateUser(data){
             let obj = {
-                "id" : data[0].idUsuario,
+                "id" : data[0].idusuario,
                 "nombre" : data[0].nombre,
                 "apellido" : data[0].apellido,
                 "email" : data[0].email,

@@ -21,10 +21,10 @@ class UserController extends BaseController
     }
 
     public function getUser($id){
-        $user = DB::table('usuario-materia')
-            ->join('materias', 'materias.id', '=', 'usuario-materia.idMateria')
-            ->join('usuarios', 'usuarios.id', '=', 'usuario-materia.idUsuario')
-            ->where('usuario-materia.idUsuario', (int)$id)
+        $user = DB::table('usuario_materia')
+            ->join('materias', 'materias.id', '=', 'usuario_materia.idmateria')
+            ->join('usuarios', 'usuarios.id', '=', 'usuario_materia.idusuario')
+            ->where('usuario_materia.idusuario', $id)
             ->get();
 
         return $user;
@@ -44,7 +44,7 @@ class UserController extends BaseController
         $password = Hash::make($request->newPassword);
         $matters = $request->materias;
 
-        DB::table('usuarios')->insert([
+        $user = DB::table('usuarios')->insert([
             'nombre' => $name,
             'apellido' => $lastname,
             'email' => $email,
@@ -52,14 +52,14 @@ class UserController extends BaseController
             'telefono' => $phone
         ]);
 
-        $id = DB::getPdo()->lastInsertId();
+        $id = DB::table('usuarios')->get()->last()->id;
 
         foreach ($matters as &$matter) {
-            $newMatter = (int)addslashes($matter);
+            $newMatter = addslashes($matter);
 
-            DB::table('usuario-materia')->insert([
-                'idUsuario' => $id,
-                'idMateria' => $newMatter
+            DB::table('usuario_materia')->insert([
+                'idusuario' => $id,
+                'idmateria' => $newMatter
             ]);
         }
 
@@ -67,8 +67,8 @@ class UserController extends BaseController
     }
 
     public function deleteUser($id){
-        DB::table('usuarios')->where('id', (int)$id)->delete();
-        DB::table('usuario-materia')->where('idUsuario', (int)$id)->delete();
+        DB::table('usuarios')->where('id', $id)->delete();
+        DB::table('usuario_materia')->where('idusuario', $id)->delete();
 
         return true;
     }
@@ -89,14 +89,14 @@ class UserController extends BaseController
                 'telefono' => $phone
             ]);
 
-        DB::table('usuario-materia')->where('idUsuario', (int)$id)->delete();
+        DB::table('usuario_materia')->where('idusuario', $id)->delete();
 
         foreach ($matters as &$matter) {
-            $newMatter = (int)addslashes($matter);
+            $newMatter = addslashes($matter);
 
-            DB::table('usuario-materia')->insert([
-                'idUsuario' => $id,
-                'idMateria' => $newMatter
+            DB::table('usuario_materia')->insert([
+                'idusuario' => $id,
+                'idmateria' => $newMatter
             ]);
         }
 
@@ -111,10 +111,10 @@ class UserController extends BaseController
 
     public function getMattersByUser($id){
 
-        $matters = DB::table('usuario-materia')
-            ->join('materias', 'materias.id', '=', 'usuario-materia.idMateria')
+        $matters = DB::table('usuario_materia')
+            ->join('materias', 'materias.id', '=', 'usuario_materia.idmateria')
             ->select('materias.nombre')
-            ->where('usuario-materia.idUsuario', (int)$id)
+            ->where('usuario_materia.idusuario', $id)
             ->get();
 
         return $matters;
